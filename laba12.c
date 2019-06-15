@@ -5,7 +5,7 @@
 #define DELIM " ,.\n\"\'\t"
 
 
-void dfs(treeNode *root, int n);
+void dfs(treeNode *root);
 void bfs(treeNode *root);
 treeNode* createNode(char *word);
 treeNode* addNode(treeNode* root, char *word);
@@ -13,8 +13,27 @@ treeNode* createTreeFromTextFile(char *filename);
 void cutLineAfterCertainSymbol(char *line, char symbol);
 int treeSize(treeNode *root);
 void deleteTree(treeNode *root);
-void createTextFile();
 
+
+int main() {
+
+	char filename[MAX_WORD_LEN];
+	printf("Enter your file name: ");
+	fgets(filename, MAX_WORD_LEN-1, stdin);
+	cutLineAfterCertainSymbol(filename, '\n'); //deleting '\n' and next symbols to avoid problems with filename
+	treeNode *root = createTreeFromTextFile(filename); 
+	
+	printf("Words count: %d\n", treeSize(root));
+	printf("\nTHIS IS A DFS\n");
+	dfs(root);
+
+	printf("\nTHIS IS A BFS\n");
+	bfs(root);
+
+	deleteTree(root); //clearing memory
+
+	return 0;
+}
 
 
 DblLinkedList* createDblLinkedList() {
@@ -80,6 +99,7 @@ void* popFront(DblLinkedList *list) {
     return tmp;
 }
 
+
 void pushBack(DblLinkedList *list, void *value) {
     Node *tmp = (Node*) malloc(sizeof(Node));
     if (tmp == NULL) {
@@ -99,6 +119,7 @@ void pushBack(DblLinkedList *list, void *value) {
     list->size++;
 }
  
+
 void* popBack(DblLinkedList *list) {
     Node *next;
     void *tmp;
@@ -120,7 +141,6 @@ void* popBack(DblLinkedList *list) {
     list->size--;
     return tmp;
 }
-
 
 
 treeNode* createTreeFromTextFile(char *filename) {
@@ -148,44 +168,6 @@ treeNode* createTreeFromTextFile(char *filename) {
 	return root;
 }
 
-void createTextFile() {
-	char filename[MAX_WORD_LEN], line[MAX_LINE_LEN];
-	printf("Enter text file name to create: ");
-	fgets(filename, MAX_WORD_LEN-1, stdin);
-	cutLineAfterCertainSymbol(filename, '\n');
-
-	if (!filename[0] || strlen(filename) < 5)
-		strncpy(filename, "default.txt", 12);
-
-	FILE *f = fopen(filename, "w");
-	if (!f) {
-		printf("Cannot open file %s\nTry another file\n", filename);
-	}
-	printf("Enter your lines ($end - is a sign of end of input): \n");
-	printf("> ");
-	fgets(line, MAX_LINE_LEN-1, stdin);
-
-	while (strcmp(line, "$end\n") != 0) {
-		size_t i = fwrite(line, sizeof(char), strlen(line), f);
-		printf("(%ld)\n", i);
-		printf("> ");
-		fgets(line, MAX_LINE_LEN-1, stdin);
-	}
-
-	fseek(f, 0L, SEEK_END);
-	long size = ftell(f);
-	fseek(f, 0L, SEEK_SET);
-
-	if (size <= 5) {
-		printf("File size is too small\nTry again\n");
-		remove(filename);
-		exit(1);
-	}
-
-	fclose(f);
-
-}
-
 
 treeNode* createNode(char *word) {
 	treeNode* node = (treeNode*)malloc(sizeof(treeNode));
@@ -195,6 +177,7 @@ treeNode* createNode(char *word) {
 	node->count = 1;
 	return node;
 }
+
 
 treeNode* addNode(treeNode* root, char *word) {
 	int cmp;
@@ -209,30 +192,37 @@ treeNode* addNode(treeNode* root, char *word) {
 	return root;
 }
 
+
 void cutLineAfterCertainSymbol(char *line, char symbol) {
 
-	int i = 0;
-
-	while (line[i]) {
-		if (line[i] == symbol) {
-			line[i] =  '\0';
-			break;
+	if (line) {
+		int i = 0;
+		while (line[i]) {
+			if (line[i] == symbol) {
+				line[i] =  '\0';
+				break;
+			}
+			++i;
 		}
-		++i;
 	}
 }
 
-void dfs(treeNode *root, int n) {
+/*
+	This dfs-function walks through the tree in (left,parent,right) order
+*/
+void dfs(treeNode *root) {
 	
 	if (root) {
-		dfs(root->left, n+1);
-		for (int i = 0; i < n; ++i)
-			printf("  ");
+		dfs(root->left);
 		printf("%s, %d\n", root->word, root->count);
-		dfs(root->right, n+1);
+		dfs(root->right);
 	}
 }
 
+
+/*
+	This function walks through the tree using breadth-first search
+*/
 void bfs(treeNode *root) {
 	
 	DblLinkedList *queue = createDblLinkedList();
@@ -263,24 +253,4 @@ void deleteTree(treeNode *root) {
 		free(root);
 		deleteTree(root->right);
 	}
-}
-
-
-
-int main() {
-
-	createTextFile();
-
-	char filename[MAX_WORD_LEN];
-	printf("Enter your file name: ");
-	fgets(filename, MAX_WORD_LEN-1, stdin);
-	cutLineAfterCertainSymbol(filename, '\n');
-	treeNode *root = createTreeFromTextFile(filename);
-	printf("\nTHIS IS A Depth-First Search\n");
-	dfs(root, 0);
-	printf("\nTHIS IS A Breadth-first search\n");
-	bfs(root);
-	deleteTree(root);
-
-	return 0;
 }
