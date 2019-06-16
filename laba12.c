@@ -8,7 +8,6 @@
 #include "structures.h"
 #define DELIM " ,.\n\"\'\t"
 
-
 void dfs(treeNode *root);
 void bfs(treeNode *root);
 treeNode* createNode(char *word);
@@ -17,7 +16,6 @@ treeNode* createTreeFromTextFile(char *filename);
 void cutLineAfterCertainSymbol(char *line, char symbol);
 int treeSize(treeNode *root);
 void deleteTree(treeNode *root);
-
 
 int main() {
 
@@ -80,7 +78,6 @@ void pushFront(DblLinkedList *list, void *data) {
     list->size++;
 }
 
-
 void* popFront(DblLinkedList *list) {
     Node *prev;
     void *tmp;
@@ -130,7 +127,6 @@ void* popBack(DblLinkedList *list) {
     if (list->tail == NULL) {
         exit(4);
     }
- 
     next = list->tail;
     list->tail = list->tail->prev;
     if (list->tail) {
