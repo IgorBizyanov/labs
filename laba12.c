@@ -1,3 +1,7 @@
+/*	
+	This program counts number of unique words from the text file
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
